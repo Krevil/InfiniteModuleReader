@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30717.126
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InfiniteModuleReader", "InfiniteModuleReader.csproj", "{71646126-1192-4FB2-B396-1EA1C5EA0803}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InfiniteModuleReader", "InfiniteModuleReader.csproj", "{71646126-1192-4FB2-B396-1EA1C5EA0803}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OodleSharp", "..\OodleSharp-master\OodleSharp\OodleSharp.csproj", "{38918299-B8E1-4F96-88F1-DB89A9C3BE5A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{71646126-1192-4FB2-B396-1EA1C5EA0803}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{71646126-1192-4FB2-B396-1EA1C5EA0803}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{71646126-1192-4FB2-B396-1EA1C5EA0803}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38918299-B8E1-4F96-88F1-DB89A9C3BE5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38918299-B8E1-4F96-88F1-DB89A9C3BE5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38918299-B8E1-4F96-88F1-DB89A9C3BE5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38918299-B8E1-4F96-88F1-DB89A9C3BE5A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

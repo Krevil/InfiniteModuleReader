@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text;
 using System.Collections.Generic;
+using OodleSharp;
 
 namespace InfiniteModuleReader
 {
@@ -9,6 +10,8 @@ namespace InfiniteModuleReader
     {
         static void Main(string[] args)
         {
+            //DecompressModuleItem("E:\\Mod Tools\\HIMU-main\\loadmanifest_bazaar", 383268); //need the size
+            //CompressModuleItem("E:\\Mod Tools\\HIMU-main\\loadmanifest_bazaar.decompressed");
             ReadModule();
         }
 
@@ -23,11 +26,39 @@ namespace InfiniteModuleReader
             return new string(ReversedHex);
         }
 
+        static void DecompressModuleItem(string item, int size) //Does not seem to work? I may be dumb
+        {
+            FileStream fileStream = new FileStream(item, FileMode.Open);
+            byte[] File = new byte[fileStream.Length];
+            fileStream.Read(File, 0, File.Length);
+            fileStream.Dispose();
+            fileStream.Close();
+            byte[] DecompressedFile = Oodle.Decompress(File, File.Length, size);
+            FileStream outputStream = new FileStream(item + ".decompressed", FileMode.Create);
+            outputStream.Read(DecompressedFile);
+            outputStream.Dispose();
+            outputStream.Close();
+        }
+
+        static void CompressModuleItem(string item)
+        {
+            FileStream fileStream = new FileStream(item, FileMode.Open);
+            byte[] File = new byte[fileStream.Length];
+            fileStream.Read(File, 0, File.Length);
+            fileStream.Dispose();
+            fileStream.Close();
+            byte[] CompressedFile = Oodle.Compress(File, File.Length, OodleFormat.Kraken, OodleCompressionLevel.Normal);
+            FileStream outputStream = new FileStream(item + ".compressed", FileMode.Create);
+            outputStream.Write(CompressedFile);
+            outputStream.Dispose();
+            outputStream.Close();
+        }
+
         static void ReadModule()
         {
             Console.WriteLine("Enter path to module:");
-            string ModulePath = Console.ReadLine();
-            //string ModulePath = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Halo Infinite\\deploy\\any\\globals\\forge\\forge_objects-rtx-new - Copy.module";
+            //string ModulePath = Console.ReadLine();
+            string ModulePath = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Halo Infinite\\deploy\\any\\levels\\campaign\\campaign_s1-rtx-new - Copy.module";
             FileStream fileStream = new FileStream(ModulePath, FileMode.Open);
             byte[] ModuleHeader = new byte[72];
             fileStream.Read(ModuleHeader, 0, 72);
@@ -43,7 +74,10 @@ namespace InfiniteModuleReader
                 ResourceCount = BitConverter.ToInt32(ModuleHeader, 40),
                 BlockCount = BitConverter.ToInt32(ModuleHeader, 44)
             };
-            module.StringTableOffset = module.ItemCount * 88 + 72;
+            module.StringTableOffset = module.ItemCount * 88 + 72; //72 is header size
+            module.ResourceListOffset = module.StringTableOffset + module.StringsSize + 8; //Still dunno why these 8 bytes are here
+            module.BlockListOffset = module.ResourceCount * 4 + module.ResourceListOffset;
+            module.FileDataOffset = module.BlockCount * 20 + module.BlockListOffset; //inaccurate, need to skip past a bunch of 00s
 
             int ItemsSize = module.ItemCount * 88;
             byte[] ModuleItems = new byte[ItemsSize];
@@ -59,7 +93,8 @@ namespace InfiniteModuleReader
                 ModuleItem moduleItem = new ModuleItem
                 {
                     NameOffset = BitConverter.ToInt32(ModuleItems, i + 64),
-                    DataOffset = BitConverter.ToUInt64(ModuleItems, i + 80),
+                    DataOffset = BitConverter.ToUInt64(ModuleItems, i + 48),
+                    TotalCompressedSize = BitConverter.ToUInt32(ModuleItems, i + 84),
                     GlobalTagId = BitConverter.ToInt32(ModuleItems, i + 40)
                 };
                 if (moduleItem.GlobalTagId == -1)
@@ -80,7 +115,7 @@ namespace InfiniteModuleReader
                 StringList.Add(moduleItem.GlobalTagId, TagName);
             }
 
-            StreamWriter output = new StreamWriter(module.ModuleId.ToString() + ".txt");
+            StreamWriter output = new StreamWriter(Path.GetFileName(ModulePath) + ".txt");
             foreach (KeyValuePair<int, string> kvp in StringList)
             {
                 output.WriteLine(ReverseHex(kvp.Key.ToString("X8")) + " : " + kvp.Value);

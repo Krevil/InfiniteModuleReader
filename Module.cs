@@ -17,6 +17,9 @@ namespace InfiniteModuleReader
         public int BlockCount { get; set; }
 
         public int StringTableOffset { get; set; }
+        public int ResourceListOffset { get; set; }
+        public int BlockListOffset { get; set; }
+        public int FileDataOffset { get; set; }
 
         public Dictionary<int, string> Strings { get; set; }
 
@@ -34,6 +37,9 @@ namespace InfiniteModuleReader
             Console.WriteLine("Block Count: " + BlockCount);
             Console.WriteLine();
             Console.WriteLine("String Table Offset: 0x" + StringTableOffset.ToString("X8"));
+            Console.WriteLine("Resource List Offset: 0x" + ResourceListOffset.ToString("X8"));
+            Console.WriteLine("Block List Offset: 0x" + BlockListOffset.ToString("X8"));
+            Console.WriteLine("File Data Offset: 0x" + FileDataOffset.ToString("X8"));
         }
     }
 }
