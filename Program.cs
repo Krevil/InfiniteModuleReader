@@ -103,7 +103,7 @@ namespace InfiniteModuleReader
                 ModuleItem moduleItem = new ModuleItem
                 {
                     ResourceCount = BitConverter.ToInt32(ModuleItems, i),
-                    ParentIndex = BitConverter.ToInt32(ModuleItems, i + 4),
+                    ParentIndex = BitConverter.ToInt32(ModuleItems, i + 4), //Seems to always be 0
                     //unknown int16 8
                     BlockCount = BitConverter.ToInt16(ModuleItems, i + 10),
                     BlockIndex = BitConverter.ToInt32(ModuleItems, i + 12),
@@ -114,14 +114,17 @@ namespace InfiniteModuleReader
                     TotalCompressedSize = BitConverter.ToUInt32(ModuleItems, i + 32),
                     TotalUncompressedSize = BitConverter.ToUInt32(ModuleItems, i + 36),
                     GlobalTagId = BitConverter.ToInt32(ModuleItems, i + 40),
-                    UncompressedTagDataSize = BitConverter.ToUInt32(ModuleItems, i + 44),
-                    //unknown int32 48
-                    //unknown int32 52
-                    //unknown int32 56
-                    UncompressedHeaderSize = BitConverter.ToUInt32(ModuleItems, i + 60),
+                    UncompressedHeaderSize = BitConverter.ToUInt32(ModuleItems, i + 44),
+                    UncompressedTagDataSize = BitConverter.ToUInt32(ModuleItems, i + 48),
+                    UncompressedResourceDataSize = BitConverter.ToUInt32(ModuleItems, i + 52),
+                    HeaderBlockCount = BitConverter.ToInt16(ModuleItems, i + 56),
+                    TagDataBlockCount = BitConverter.ToInt16(ModuleItems, i + 58),
+                    ResourceBlockCount = BitConverter.ToInt16(ModuleItems, i + 60),
+                    //padding
                     NameOffset = BitConverter.ToInt32(ModuleItems, i + 64),
-                    //unknown int32 68
-                    //Asset Checksum? 10 bytes
+                    //unknown int32 68 //Seems to always be -1
+                    AssetChecksum = BitConverter.ToInt64(ModuleItems, i + 72),
+                    AssetId = BitConverter.ToInt64(ModuleItems, i + 80)
                 };
                 if (moduleItem.GlobalTagId == -1)
                 {

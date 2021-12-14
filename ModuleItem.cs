@@ -1,49 +1,68 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.Text;
 
 namespace InfiniteModuleReader
 {
-    public class ModuleItem
+    [StructLayout(LayoutKind.Explicit, Size=88)]
+    public struct ModuleItem
     {
-        public Module Module { get; }
+        [FieldOffset(0)]
+        public int ResourceCount;
 
-        public int ResourceCount { get; set; }
-        public int ParentIndex { get; set; }
-        public byte Flags { get; set; } //Not a thing?
-        public short BlockCount { get; set; }
-        public int BlockIndex { get; set; }
-        public int ResourceIndex { get; set; }
-        public int ClassId { get; set; } //BigEndian
-        public uint DataOffset { get; set; }
-        public uint TotalCompressedSize { get; set; }
-        public uint TotalUncompressedSize { get; set; }
-        public int GlobalTagId { get; set; }
-        public long AssetId { get; set; }
-        public long AssetChecksum { get; set; }
-        public uint UncompressedHeaderSize { get; set; }
-        public int NameOffset { get; set; }
-        public uint UncompressedTagDataSize { get; set; }
-        public uint UncompressedResourceDataSize { get; set; }
-        public short HeaderBlockCount { get; set; }
-        public short TagDataBlockCount { get; set; }
-        public short ResourceBlockCount { get; set; }
+        [FieldOffset(4)]
+        public int ParentIndex;
 
-        public string ClassCode => (ClassId == -1) ? null : Encoding.UTF8.GetString(BitConverter.GetBytes(ClassId));
+        [FieldOffset(10)]
+        public short BlockCount;
 
-        private string fileName => Module.Strings[NameOffset];
+        [FieldOffset(12)]
+        public int BlockIndex;
 
-        public string FullPath
-        {
-            get
-            {
-                if (GlobalTagId == -1)
-                    return fileName;
+        [FieldOffset(16)]
+        public int ResourceIndex;
 
-                var len = fileName.LastIndexOf('.');
-                return fileName.Substring(0, len);
-            }
-        }
+        [FieldOffset(20)]
+        public int ClassId; //BigEndian
+
+        [FieldOffset(24)]
+        public uint DataOffset;
+
+        [FieldOffset(32)]
+        public uint TotalCompressedSize;
+        [FieldOffset(36)]
+        public uint TotalUncompressedSize;
+
+        [FieldOffset(40)]
+        public int GlobalTagId;
+
+        [FieldOffset(44)]
+        public uint UncompressedHeaderSize;
+
+        [FieldOffset(48)]
+        public uint UncompressedTagDataSize;
+
+        [FieldOffset(52)]
+        public uint UncompressedResourceDataSize;
+
+        [FieldOffset(56)]
+        public short HeaderBlockCount;
+
+        [FieldOffset(58)]
+        public short TagDataBlockCount;
+
+        [FieldOffset(60)]
+        public short ResourceBlockCount;
+
+        [FieldOffset(64)]
+        public int NameOffset;
+
+        [FieldOffset(72)]
+        public long AssetChecksum;
+
+        [FieldOffset(80)]
+        public long AssetId;
 
     }
 }
