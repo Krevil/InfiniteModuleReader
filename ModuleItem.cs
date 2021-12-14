@@ -10,12 +10,12 @@ namespace InfiniteModuleReader
 
         public int ResourceCount { get; set; }
         public int ParentIndex { get; set; }
-        public byte Flags { get; set; }
+        public byte Flags { get; set; } //Not a thing?
         public short BlockCount { get; set; }
         public int BlockIndex { get; set; }
         public int ResourceIndex { get; set; }
         public int ClassId { get; set; } //BigEndian
-        public ulong DataOffset { get; set; }
+        public uint DataOffset { get; set; }
         public uint TotalCompressedSize { get; set; }
         public uint TotalUncompressedSize { get; set; }
         public int GlobalTagId { get; set; }

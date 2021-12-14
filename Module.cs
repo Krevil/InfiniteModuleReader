@@ -19,7 +19,7 @@ namespace InfiniteModuleReader
         public int StringTableOffset { get; set; }
         public int ResourceListOffset { get; set; }
         public int BlockListOffset { get; set; }
-        public int FileDataOffset { get; set; }
+        public long FileDataOffset { get; set; }
 
         public Dictionary<int, string> Strings { get; set; }
 
