@@ -7,4 +7,4 @@ Derived from:
 - https://github.com/MontagueM/HaloInfiniteModuleUnpacker
 - https://github.com/ElDewrito/AusarDocs
 
-As well as support from Matthew, Exhibit, Sopitive and other members of the Halo Modding community.
+As well as support from Matthew, Exhibit, Sopitive, Zeddikins and other members of the Halo Modding community.
