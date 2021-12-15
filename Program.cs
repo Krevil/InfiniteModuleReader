@@ -226,13 +226,13 @@ namespace InfiniteModuleReader
             byte[] TagFile = new byte[fileStream.Length];
             fileStream.Read(TagFile, 0, TagFile.Length);
             fileStream.Close();
-
             GCHandle gcHandle = GCHandle.Alloc(TagFile, GCHandleType.Pinned);
-            FileHeader fileHeader = (FileHeader)Marshal.PtrToStructure(gcHandle.AddrOfPinnedObject(), typeof(FileHeader)); //No idea how this magic bytes to structure stuff works, I just got this from github
-
-            foreach (var a in fileHeader.GetType().GetFields())
+            Tag tag = new Tag();
+            tag.Header = (FileHeader)Marshal.PtrToStructure(gcHandle.AddrOfPinnedObject(), typeof(FileHeader)); //No idea how this magic bytes to structure stuff works, I just got this from github
+            
+            foreach (var a in tag.Header.GetType().GetFields())
             {
-                Console.WriteLine("{0} : {1}", a.Name, a.GetValue(fileHeader));
+                Console.WriteLine("{0} : {1}", a.Name, a.GetValue(tag.Header));
             }
         }
     } 

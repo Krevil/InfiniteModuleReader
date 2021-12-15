@@ -5,7 +5,23 @@ using System.Text;
 
 namespace InfiniteModuleReader
 {
-    [Serializable]
+    public class Tag
+    {
+        public FileHeader Header { get; set; }
+        public TagDependency[] TagDependencyList { get; set; }
+        public DataBlock[] DataBlockList { get; set; }
+        public TagStruct[] TagStructList { get; set; }
+        public DataReference[] DataReferenceList { get; set; }
+        public TagReferenceFixup[] TagReferenceFixupList { get; set; }
+        public StringID[] StringIDList { get; set; }
+        public string[] StringTable { get; set; }
+        public ZoneSetInformationHeader ZoneSetInfoHeader { get; set; }
+        public ZoneSetEntry[] ZoneSetEntryList { get; set; }
+        public ZoneSetTag[] ZoneSetTagList { get; set; }
+        public byte[] TagData { get; set; }
+        public byte[] ResourceData { get; set; }
+    }
+
     [StructLayout(LayoutKind.Explicit, Size = 80)]
     public struct FileHeader
     {
