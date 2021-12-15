@@ -2,6 +2,8 @@
 using System.IO;
 using System.Text;
 using System.Collections.Generic;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Runtime.InteropServices;
 using OodleSharp;
 
 namespace InfiniteModuleReader
@@ -12,8 +14,9 @@ namespace InfiniteModuleReader
         {
             //DecompressModuleItem("E:\\Mod Tools\\HIMU-main\\loadmanifest_bazaar", 383268); //need the size
             //CompressModuleItem("E:\\Mod Tools\\HIMU-main\\loadmanifest_bazaar.decompressed");
-            //CompressModuleItem("E:\\CSharp\\InfiniteModuleReader\\bin\\Debug\\netcoreapp3.1\\file1_edit");
-            ReadModule();
+            //CompressModuleItem("E:\\CSharp\\InfiniteModuleReader\\bin\\Debug\\netcoreapp3.1\\masterchief_openworld.model_Data");
+            //ReadModule();
+            ReadTag("masterchief_openworld.model");
         }
 
         static string ReverseHex(string hex)
@@ -32,12 +35,10 @@ namespace InfiniteModuleReader
             FileStream fileStream = new FileStream(item, FileMode.Open);
             byte[] File = new byte[fileStream.Length];
             fileStream.Read(File, 0, File.Length);
-            fileStream.Dispose();
             fileStream.Close();
             byte[] DecompressedFile = Oodle.Decompress(File, File.Length, size);
             FileStream outputStream = new FileStream(item + ".decompressed", FileMode.Create);
             outputStream.Write(DecompressedFile);
-            outputStream.Dispose();
             outputStream.Close();
         }
 
@@ -46,21 +47,21 @@ namespace InfiniteModuleReader
             FileStream fileStream = new FileStream(item, FileMode.Open);
             byte[] File = new byte[fileStream.Length];
             fileStream.Read(File, 0, File.Length);
-            fileStream.Dispose();
             fileStream.Close();
-            Console.WriteLine(File.Length);
-            byte[] CompressedFile = Oodle.Compress(File, File.Length, OodleFormat.Kraken, OodleCompressionLevel.Normal);
+            byte[] CompressedFile = Oodle.Compress(File, File.Length, OodleFormat.Kraken, OodleCompressionLevel.Optimal5);
             FileStream outputStream = new FileStream(item + ".compressed", FileMode.Create);
             outputStream.Write(CompressedFile);
-            outputStream.Dispose();
             outputStream.Close();
         }
 
         static void ReadModule()
         {
             Console.WriteLine("Enter path to module:");
-            string ModulePath = Console.ReadLine();
-            //string ModulePath = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Halo Infinite\\deploy\\any\\globals\\globals-rtx-new - Copy.module";
+            //string ModulePath = Console.ReadLine();
+            string ModulePath = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Halo Infinite\\deploy\\any\\globals\\globals-rtx-new - Copy.module";
+            Console.WriteLine("Search for tag to edit:");
+            //string SearchTerm = Console.ReadLine();
+            string SearchTerm = "masterchief_openworld.model";
             FileStream fileStream = new FileStream(ModulePath, FileMode.Open);
             byte[] ModuleHeader = new byte[72];
             fileStream.Read(ModuleHeader, 0, 72);
@@ -143,7 +144,7 @@ namespace InfiniteModuleReader
                 }
                 StringList.Add(moduleItem.GlobalTagId, TagName);
                 //for testing
-                if (!TagName.Contains("proto_spike_revolver_mp"))
+                if (!TagName.Contains(SearchTerm))
                 {
                     continue;
                 }
@@ -152,16 +153,15 @@ namespace InfiniteModuleReader
                     continue;
                 }
                 ulong FirstBlockOffset = moduleItem.DataOffset + (ulong)module.FileDataOffset;
-                //Console.WriteLine("First block offset: " + FirstBlockOffset);
-                //Console.WriteLine(TagName);
-                FileStream outputStream = new FileStream(TagName.Substring(TagName.LastIndexOf("\\") + 1, TagName.Length - TagName.LastIndexOf("\\") - 2), FileMode.Create);
+                string ShortTagName = TagName.Substring(TagName.LastIndexOf("\\") + 1, TagName.Length - TagName.LastIndexOf("\\") - 2);
+                FileStream outputStream = new FileStream(ShortTagName, FileMode.Create);
                 if (moduleItem.BlockCount != 0)
                 {         
                     for (int y = 0; y < moduleItem.BlockCount; y++)
                     {
                         byte[] BlockBuffer = new byte[20];
                         fileStream.Seek((moduleItem.BlockIndex * 20)  + module.BlockListOffset + (y * 20), 0);
-                        Console.WriteLine("Block List Offset {1}: {0}", fileStream.Position, y + 1); //Insert block back in here
+                        Console.WriteLine("Block Info Location: {0}", fileStream.Position);
                         fileStream.Read(BlockBuffer, 0, 20);
                         Block block = new Block
                         {
@@ -171,19 +171,23 @@ namespace InfiniteModuleReader
                             UncompressedSize = BitConverter.ToUInt32(BlockBuffer, 12),
                             Compressed = BitConverter.ToBoolean(BlockBuffer, 16)
                         };
-                        //Console.WriteLine("Compressed Offset: {0}", block.CompressedOffset);
-                        //Console.WriteLine("Compressed Size: {0}", block.CompressedSize);
+
                         //This is where it gets ugly-er
+                        string CurrentBlock = (y == 0) ? "Header" : "Data";
                         byte[] BlockFile = new byte[block.CompressedSize];
                         ulong BlockOffset = FirstBlockOffset + block.CompressedOffset;
                         fileStream.Seek((long)BlockOffset, 0);
-                        //Console.WriteLine("Block Offset: {0}", BlockOffset);
+                        Console.WriteLine("Block Location {1}: {0}, Block Size: {2}", fileStream.Position, y + 1, block.CompressedSize); //Insert block back in here
                         fileStream.Read(BlockFile, 0, (int)block.CompressedSize);
                         if (block.Compressed)
                         {
                             byte[] DecompressedFile = Oodle.Decompress(BlockFile, BlockFile.Length, (int)block.UncompressedSize);
+                            if (y == 1) //if block is tag data
+                            {
+                                Console.WriteLine();
+                            }
                             outputStream.Write(DecompressedFile);
-                            FileStream testStream = new FileStream("file" + y, FileMode.Create);
+                            FileStream testStream = new FileStream(ShortTagName + "_" + CurrentBlock, FileMode.Create);
                             testStream.Write(DecompressedFile);
                             testStream.Close();
                         }
@@ -202,7 +206,6 @@ namespace InfiniteModuleReader
                     byte[] DecompressedFile = Oodle.Decompress(CompressedFile, (int)moduleItem.TotalCompressedSize, (int)moduleItem.TotalUncompressedSize);
                     outputStream.Write(DecompressedFile);
                 }
-                outputStream.Dispose();
                 outputStream.Close();
             }
 
@@ -213,10 +216,24 @@ namespace InfiniteModuleReader
             }
 
             module.PrintInfo();
-            fileStream.Dispose();
             fileStream.Close();
-            output.Dispose();
             output.Close();
         }
-    }
+
+        static void ReadTag(string FilePath)
+        {
+            FileStream fileStream = new FileStream(FilePath, FileMode.Open);
+            byte[] TagFile = new byte[fileStream.Length];
+            fileStream.Read(TagFile, 0, TagFile.Length);
+            fileStream.Close();
+
+            GCHandle gcHandle = GCHandle.Alloc(TagFile, GCHandleType.Pinned);
+            FileHeader fileHeader = (FileHeader)Marshal.PtrToStructure(gcHandle.AddrOfPinnedObject(), typeof(FileHeader)); //No idea how this magic bytes to structure stuff works, I just got this from github
+
+            foreach (var a in fileHeader.GetType().GetFields())
+            {
+                Console.WriteLine("{0} : {1}", a.Name, a.GetValue(fileHeader));
+            }
+        }
+    } 
 }
