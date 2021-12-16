@@ -16,7 +16,7 @@ namespace InfiniteModuleReader
             //CompressModuleItem("E:\\Mod Tools\\HIMU-main\\loadmanifest_bazaar.decompressed");
             //CompressModuleItem("E:\\CSharp\\InfiniteModuleReader\\bin\\Debug\\netcoreapp3.1\\masterchief_openworld.model_Data");
             //ReadModule();
-            ReadTag("masterchief_openworld.model");
+            ReadTag("masterchief_openworld.biped");
         }
 
         static string ReverseHex(string hex)
@@ -28,6 +28,21 @@ namespace InfiniteModuleReader
                 ReversedHex[i + 1] = hex[hex.Length -1 - i];
             }
             return new string(ReversedHex);
+        }
+
+        static string ReverseString(string s)
+        {
+            string output = "";
+            for (int i = s.Length - 1; i > -1; i--)
+            {
+                output += s[i];
+            }
+            return output;
+        }
+
+        static string GetClassID(int i)
+        {
+            return ReverseString(Encoding.Default.GetString(BitConverter.GetBytes(i)));
         }
 
         static void DecompressModuleItem(string item, int size)
@@ -48,7 +63,7 @@ namespace InfiniteModuleReader
             byte[] File = new byte[fileStream.Length];
             fileStream.Read(File, 0, File.Length);
             fileStream.Close();
-            byte[] CompressedFile = Oodle.Compress(File, File.Length, OodleFormat.Kraken, OodleCompressionLevel.Optimal5);
+            byte[] CompressedFile = Oodle.Compress(File, File.Length, OodleFormat.Kraken, OodleCompressionLevel.Optimal5); //Set to optimal because a smaller file can be put back in but a bigger one is no bueno
             FileStream outputStream = new FileStream(item + ".compressed", FileMode.Create);
             outputStream.Write(CompressedFile);
             outputStream.Close();
@@ -61,7 +76,7 @@ namespace InfiniteModuleReader
             string ModulePath = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Halo Infinite\\deploy\\any\\globals\\globals-rtx-new - Copy.module";
             Console.WriteLine("Search for tag to edit:");
             //string SearchTerm = Console.ReadLine();
-            string SearchTerm = "masterchief_openworld.model";
+            string SearchTerm = "masterchief_openworld.biped";
             FileStream fileStream = new FileStream(ModulePath, FileMode.Open);
             byte[] ModuleHeader = new byte[72];
             fileStream.Read(ModuleHeader, 0, 72);
@@ -222,17 +237,140 @@ namespace InfiniteModuleReader
 
         static void ReadTag(string FilePath)
         {
-            FileStream fileStream = new FileStream(FilePath, FileMode.Open);
-            byte[] TagFile = new byte[fileStream.Length];
-            fileStream.Read(TagFile, 0, TagFile.Length);
-            fileStream.Close();
-            GCHandle gcHandle = GCHandle.Alloc(TagFile, GCHandleType.Pinned);
-            Tag tag = new Tag();
-            tag.Header = (FileHeader)Marshal.PtrToStructure(gcHandle.AddrOfPinnedObject(), typeof(FileHeader)); //No idea how this magic bytes to structure stuff works, I just got this from github
             
+            Tag tag = new Tag();
+            byte[] TagHeader = new byte[80];
+            
+
+            FileStream fileStream = new FileStream(FilePath, FileMode.Open);
+            fileStream.Read(TagHeader, 0, 80);
+            
+
+            GCHandle HeaderHandle = GCHandle.Alloc(TagHeader, GCHandleType.Pinned);
+            tag.Header = (FileHeader)Marshal.PtrToStructure(HeaderHandle.AddrOfPinnedObject(), typeof(FileHeader)); //No idea how this magic bytes to structure stuff works, I just got this from github
+            HeaderHandle.Free();
+
+            tag.TagDependencyList = new TagDependency[tag.Header.DependencyCount];
+            tag.DataBlockList = new DataBlock[tag.Header.DataBlockCount];
+            tag.TagStructList = new TagStruct[tag.Header.TagStructCount];
+            tag.DataReferenceList = new DataReference[tag.Header.DataReferenceCount];
+            tag.TagReferenceFixupList = new TagReferenceFixup[tag.Header.TagReferenceCount];
+            //tag.StringIDList = new StringID[tag.Header.StringIDCount]; //Not sure about the StringIDCount. Needs investigation
+            tag.StringTable = new byte[tag.Header.StringTableSize];
+
+            for (long l = 0; l < tag.Header.DependencyCount; l++) //For each tag dependency, fill in its values
+            {
+                byte[] TagDependencyBytes = new byte[Marshal.SizeOf(tag.TagDependencyList[l])];
+                fileStream.Read(TagDependencyBytes, 0, Marshal.SizeOf(tag.TagDependencyList[l]));
+                GCHandle TagDependencyHandle = GCHandle.Alloc(TagDependencyBytes, GCHandleType.Pinned);
+                tag.TagDependencyList[l] = (TagDependency)Marshal.PtrToStructure(TagDependencyHandle.AddrOfPinnedObject(), typeof(TagDependency));
+                TagDependencyHandle.Free();
+            }
+
+            for (long l = 0; l < tag.Header.DataBlockCount; l++)
+            {
+                byte[] DataBlockBytes = new byte[Marshal.SizeOf(tag.DataBlockList[l])];
+                fileStream.Read(DataBlockBytes, 0, Marshal.SizeOf(tag.DataBlockList[l]));
+                GCHandle DataBlockHandle = GCHandle.Alloc(DataBlockBytes, GCHandleType.Pinned);
+                tag.DataBlockList[l] = (DataBlock)Marshal.PtrToStructure(DataBlockHandle.AddrOfPinnedObject(), typeof(DataBlock));
+                DataBlockHandle.Free();
+            }
+
+            for (long l = 0; l < tag.Header.TagStructCount; l++)
+            {
+                byte[] TagStructBytes = new byte[Marshal.SizeOf(tag.TagStructList[l])];
+                fileStream.Read(TagStructBytes, 0, Marshal.SizeOf(tag.TagStructList[l]));
+                GCHandle TagStructHandle = GCHandle.Alloc(TagStructBytes, GCHandleType.Pinned);
+                tag.TagStructList[l] = (TagStruct)Marshal.PtrToStructure(TagStructHandle.AddrOfPinnedObject(), typeof(TagStruct));
+                TagStructHandle.Free();
+            }
+
+            for (long l = 0; l < tag.Header.DataReferenceCount; l++)
+            {
+                byte[] DataReferenceBytes = new byte[Marshal.SizeOf(tag.DataReferenceList[l])];
+                fileStream.Read(DataReferenceBytes, 0, Marshal.SizeOf(tag.DataReferenceList[l]));
+                GCHandle DataReferenceHandle = GCHandle.Alloc(DataReferenceBytes, GCHandleType.Pinned);
+                tag.DataReferenceList[l] = (DataReference)Marshal.PtrToStructure(DataReferenceHandle.AddrOfPinnedObject(), typeof(DataReference));
+                DataReferenceHandle.Free();
+            }
+
+            for (long l = 0; l < tag.Header.TagReferenceCount; l++)
+            {
+                byte[] TagReferenceBytes = new byte[Marshal.SizeOf(tag.TagReferenceFixupList[l])];
+                fileStream.Read(TagReferenceBytes, 0, Marshal.SizeOf(tag.TagReferenceFixupList[l]));
+                GCHandle TagReferenceHandle = GCHandle.Alloc(TagReferenceBytes, GCHandleType.Pinned);
+                tag.TagReferenceFixupList[l] = (TagReferenceFixup)Marshal.PtrToStructure(TagReferenceHandle.AddrOfPinnedObject(), typeof(TagReferenceFixup));
+                TagReferenceHandle.Free();
+            }
+            
+            fileStream.Read(tag.StringTable, 0, (int)tag.Header.StringTableSize); //better hope this never goes beyond sizeof(int)
+            Console.WriteLine("Pos after string table: {0}", fileStream.Position);
+
+            //Not sure about this stuff, might not be in every tag?
+            /*
+            if (tag.Header.ZoneSetDataSize > 1)
+            {
+                byte[] ZoneSetHeader = new byte[16];
+                fileStream.Read(ZoneSetHeader, 0, 16);
+                GCHandle ZoneSetHandle = GCHandle.Alloc(ZoneSetHeader, GCHandleType.Pinned);
+                tag.ZoneSetInfoHeader = (ZoneSetInformationHeader)Marshal.PtrToStructure(ZoneSetHandle.AddrOfPinnedObject(), typeof(ZoneSetInformationHeader));
+                ZoneSetHandle.Free();
+
+                tag.ZoneSetEntryList = new ZoneSetEntry[tag.ZoneSetInfoHeader.ZoneSetCount];
+                long ZoneSetTagCount = 0;
+                foreach (ZoneSetEntry zse in tag.ZoneSetEntryList)
+                {
+                    ZoneSetTagCount += zse.TagCount;
+                }
+                tag.ZoneSetTagList = new ZoneSetTag[ZoneSetTagCount];
+            }
+            */
+
+            fileStream.Close();
+            Console.WriteLine("File Header:");
             foreach (var a in tag.Header.GetType().GetFields())
             {
                 Console.WriteLine("{0} : {1}", a.Name, a.GetValue(tag.Header));
+            }
+            Console.WriteLine("Tag Depdendencies:");
+            foreach (TagDependency tagDependency in tag.TagDependencyList)
+            {
+                foreach (var a in tagDependency.GetType().GetFields())
+                {
+                    Console.WriteLine("{0} : {1}", a.Name, a.GetValue(tagDependency));
+                }
+            }
+            Console.WriteLine("Data Blocks:");
+            foreach (DataBlock dataBlock in tag.DataBlockList)
+            {
+                foreach (var a in dataBlock.GetType().GetFields())
+                {
+                    Console.WriteLine("{0} : {1}", a.Name, a.GetValue(dataBlock));
+                }
+            }
+            Console.WriteLine("Tag Structs:");
+            foreach (TagStruct tagStruct in tag.TagStructList)
+            {
+                foreach (var a in tagStruct.GetType().GetFields())
+                {
+                    Console.WriteLine("{0} : {1}", a.Name, a.GetValue(tagStruct));
+                }
+            }
+            Console.WriteLine("Data References:");
+            foreach (DataReference dataReference in tag.DataReferenceList)
+            {
+                foreach (var a in dataReference.GetType().GetFields())
+                {
+                    Console.WriteLine("{0} : {1}", a.Name, a.GetValue(dataReference));
+                }
+            }
+            Console.WriteLine("Tag References:");
+            foreach (TagReferenceFixup tagReferenceFixup in tag.TagReferenceFixupList)
+            {
+                foreach (var a in tagReferenceFixup.GetType().GetFields())
+                {
+                    Console.WriteLine("{0} : {1}", a.Name, a.GetValue(tagReferenceFixup));
+                }
             }
         }
     } 

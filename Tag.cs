@@ -13,8 +13,8 @@ namespace InfiniteModuleReader
         public TagStruct[] TagStructList { get; set; }
         public DataReference[] DataReferenceList { get; set; }
         public TagReferenceFixup[] TagReferenceFixupList { get; set; }
-        public StringID[] StringIDList { get; set; }
-        public string[] StringTable { get; set; }
+        public StringID[] StringIDList { get; set; } //Not a thing in Infinite?
+        public byte[] StringTable { get; set; }
         public ZoneSetInformationHeader ZoneSetInfoHeader { get; set; }
         public ZoneSetEntry[] ZoneSetEntryList { get; set; }
         public ZoneSetTag[] ZoneSetTagList { get; set; }
@@ -47,7 +47,7 @@ namespace InfiniteModuleReader
         public int TagStructCount;
 
         [FieldOffset(36)]
-        public int DataReferenceCOunt;
+        public int DataReferenceCount;
 
         [FieldOffset(40)]
         public int TagReferenceCount;
@@ -128,7 +128,10 @@ namespace InfiniteModuleReader
     public struct TagStruct
     {
         [FieldOffset(0)]
-        public byte[] GUID;
+        public long GUID1;
+
+        [FieldOffset(8)]
+        public long GUID2;
 
         [FieldOffset(16)]
         public short Type;
@@ -165,23 +168,20 @@ namespace InfiniteModuleReader
         public uint FieldOffset;
     }
 
-    [StructLayout(LayoutKind.Explicit, Size = 28)]
+    [StructLayout(LayoutKind.Explicit, Size = 16)]
     public struct TagReferenceFixup
     {
         [FieldOffset(0)]
-        public ulong TypeInfo;
+        public int FieldBlock;
+
+        [FieldOffset(4)]
+        public uint GlobalID;
 
         [FieldOffset(8)]
-        public int GlobalID;
+        public uint NameOffset;
 
         [FieldOffset(12)]
-        public long AssetID;
-
-        [FieldOffset(20)]
-        public int GroupTag;
-
-        [FieldOffset(24)]
-        public int LocalHandle;
+        public int DepdencyIndex;
     }
 
     [StructLayout(LayoutKind.Explicit, Size = 8)]
