@@ -29,6 +29,130 @@ namespace InfiniteModuleReader
             return output;
         }
 
+        public static float Angle(float value)
+        {
+            return (value + 90) % 360;
+        }
+
+        public static void WriteObjectInfo(StreamWriter stream, object[] objlist, string objname)
+        {
+            int i = 1;
+            foreach (object obj in objlist)
+            {
+                stream.WriteLine("{0} {1}:", objname, i);
+                foreach (var a in obj.GetType().GetFields())
+                {
+                    stream.WriteLine("  {0} : {1}", a.Name, a.GetValue(obj));
+                }
+                i++;
+                stream.WriteLine();
+            }
+        }
+
+        public static void WriteObjectInfo(StreamWriter stream, TagDependency[] objlist, string objname)
+        {
+            int i = 1;
+            foreach (object obj in objlist)
+            {
+                stream.WriteLine("{0} {1}:", objname, i);
+                foreach (var a in obj.GetType().GetFields())
+                {
+                    stream.WriteLine("  {0} : {1}", a.Name, a.GetValue(obj));
+                }
+                i++;
+                stream.WriteLine();
+            }
+        }
+
+        public static void WriteObjectInfo(StreamWriter stream, DataBlock[] objlist, string objname)
+        {
+            int i = 1;
+            foreach (object obj in objlist)
+            {
+                stream.WriteLine("{0} {1}:", objname, i);
+                foreach (var a in obj.GetType().GetFields())
+                {
+                    stream.WriteLine("  {0} : {1}", a.Name, a.GetValue(obj));
+                }
+                i++;
+                stream.WriteLine();
+            }
+        }
+
+        public static void WriteObjectInfo(StreamWriter stream, TagStruct[] objlist, string objname)
+        {
+            int i = 1;
+            foreach (object obj in objlist)
+            {
+                stream.WriteLine("{0} {1}:", objname, i);
+                foreach (var a in obj.GetType().GetFields())
+                {
+                    stream.WriteLine("  {0} : {1}", a.Name, a.GetValue(obj));
+                }
+                i++;
+                stream.WriteLine();
+            }
+        }
+
+        public static void WriteObjectInfo(StreamWriter stream, DataReference[] objlist, string objname)
+        {
+            int i = 1;
+            foreach (object obj in objlist)
+            {
+                stream.WriteLine("{0} {1}:", objname, i);
+                foreach (var a in obj.GetType().GetFields())
+                {
+                    stream.WriteLine("  {0} : {1}", a.Name, a.GetValue(obj));
+                }
+                i++;
+                stream.WriteLine();
+            }
+        }
+        public static void WriteObjectInfo(StreamWriter stream, TagReferenceFixup[] objlist, string objname)
+        {
+            int i = 1;
+            foreach (object obj in objlist)
+            {
+                stream.WriteLine("{0} {1}:", objname, i);
+                foreach (var a in obj.GetType().GetFields())
+                {
+                    stream.WriteLine("  {0} : {1}", a.Name, a.GetValue(obj));
+                }
+                i++;
+                stream.WriteLine();
+            }
+        }
+
+        public static void WriteObjectInfo(StreamWriter stream, TagBlock[] objlist, string objname)
+        {
+            int i = 1;
+            foreach (object obj in objlist)
+            {
+                stream.WriteLine("{0} {1}:", objname, i);
+                foreach (var a in obj.GetType().GetFields())
+                {
+                    stream.WriteLine("  {0} : {1}", a.Name, a.GetValue(obj));
+                }
+                i++;
+                stream.WriteLine();
+            }
+        }
+
+        public static void WriteObjectInfo(StreamWriter stream, TagReference[] objlist, string objname)
+        {
+            int i = 1;
+            foreach (object obj in objlist)
+            {
+                stream.WriteLine("{0} {1}:", objname, i);
+                foreach (var a in obj.GetType().GetFields())
+                {
+                    stream.WriteLine("  {0} : {1}", a.Name, a.GetValue(obj));
+                }
+                i++;
+                stream.WriteLine();
+            }
+        }
+
         public static string GetClassID(int i)
         {
             return ReverseString(Encoding.Default.GetString(BitConverter.GetBytes(i)));

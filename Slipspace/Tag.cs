@@ -276,6 +276,32 @@ namespace InfiniteModuleReader
 
         [FieldOffset(24)]
         public int LocalHandle;
+
+        public override string ToString()
+        {
+            return GlobalID + " " + Utilities.GetClassID(GroupTag);
+        }
+    }
+
+    [StructLayout(LayoutKind.Explicit, Size = 24)]
+    public struct DataReferenceField
+    {
+        [FieldOffset(0)]
+        ulong Data;
+
+        [FieldOffset(8)]
+        ulong TypeInfo;
+
+        [FieldOffset(16)]
+        public int UnknownProperty;
+
+        [FieldOffset(20)]
+        public uint Size;
+
+        public override string ToString()
+        {
+            return "Data Size:" + Size;
+        }
     }
 
     [StructLayout(LayoutKind.Explicit, Size = 16)]
@@ -289,5 +315,109 @@ namespace InfiniteModuleReader
 
         [FieldOffset(12)]
         public int UnknownProperty;
+    }
+
+    [StructLayout(LayoutKind.Explicit, Size = 8)]
+    public struct RealBounds
+    {
+        [FieldOffset(0)]
+        public float MinBound;
+
+        [FieldOffset(4)]
+        public float MaxBound;
+
+        public override string ToString()
+        {
+            return MinBound + " " + MaxBound;
+        }
+    }
+
+    [StructLayout(LayoutKind.Explicit, Size = 12)]
+    public struct RealVector3D
+    {
+        [FieldOffset(0)]
+        public float i;
+
+        [FieldOffset(4)]
+        public float j;
+
+        [FieldOffset(8)]
+        public float k;
+
+        public override string ToString()
+        {
+            return i + " " + j + " " + k;
+        }
+    }
+
+    [Flags]
+    public enum Flags8 : byte
+    {
+        Bit0 = 1,
+        Bit1 = 2,
+        Bit2 = 4,
+        Bit3 = 8,
+        Bit4 = 16,
+        Bit5 = 32,
+        Bit6 = 64,
+        Bit7 = 128
+    }
+
+    [Flags]
+    public enum Flags16 : ushort
+    {
+        Bit0 = 1,
+        Bit1 = 2,
+        Bit2 = 4,
+        Bit3 = 8,
+        Bit4 = 16,
+        Bit5 = 32,
+        Bit6 = 64,
+        Bit7 = 128,
+        Bit8 = 256,
+        Bit9 = 512,
+        Bit10 = 1024,
+        Bit11 = 2048,
+        Bit12 = 4096,
+        Bit13 = 8192,
+        Bit14 = 16384,
+        Bit15 = 32768
+    }
+
+    [Flags]
+    public enum Flags32 : uint
+    {
+        Bit0 = 1,
+        Bit1 = 2,
+        Bit2 = 4,
+        Bit3 = 8,
+        Bit4 = 16,
+        Bit5 = 32,
+        Bit6 = 64,
+        Bit7 = 128,
+        Bit8 = 256,
+        Bit9 = 512,
+        Bit10 = 1024,
+        Bit11 = 2048,
+        Bit12 = 4096,
+        Bit13 = 8192,
+        Bit14 = 16384,
+        Bit15 = 32768,
+        Bit16 = 65536,
+        Bit17 = 131072,
+        Bit18 = 262144,
+        Bit19 = 524288,
+        Bit20 = 1048576,
+        Bit21 = 2097152,
+        Bit22 = 4194304,
+        Bit23 = 8388608,
+        Bit24 = 16777216,
+        Bit25 = 33554432,
+        Bit26 = 67108864,
+        Bit27 = 134217728,
+        Bit28 = 268435456,
+        Bit29 = 536870912,
+        Bit30 = 1073741824,
+        Bit31 = 2147483648,
     }
 }

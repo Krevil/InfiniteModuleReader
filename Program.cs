@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using System.Xml;
 using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.InteropServices;
@@ -16,7 +17,7 @@ namespace InfiniteModuleReader
             //CompressModuleItem("E:\\Mod Tools\\HIMU-main\\loadmanifest_bazaar.decompressed");
             //CompressModuleItem("E:\\CSharp\\InfiniteModuleReader\\bin\\Debug\\netcoreapp3.1\\masterchief_openworld.model_Data");
             //ReadModule();
-            ReadTag("masterchief_openworld.biped");
+            ReadTag("ability_grapple_hook.grapplehookdefinitiontag");
         }
 
         static void ReadModule()
@@ -254,7 +255,7 @@ namespace InfiniteModuleReader
             }
             
             fileStream.Read(tag.StringTable, 0, (int)tag.Header.StringTableSize); //better hope this never goes beyond sizeof(int)
-            Console.WriteLine("Pos after string table: {0}", fileStream.Position);
+
 
             //Not sure about this stuff, might not be in every tag?
             /*
@@ -276,52 +277,52 @@ namespace InfiniteModuleReader
             }
             */
 
+            fileStream.Seek(tag.Header.StringIDCount, SeekOrigin.Current); //Data starts here after the "StringID" section which is probably something else
+            tag.TagData = new byte[tag.Header.DataSize];
+            fileStream.Read(tag.TagData, 0, (int)tag.Header.DataSize);
+            GrappleHookDefinition grappleHookDefinition = new GrappleHookDefinition();
+
+            GCHandle TagDataHandle = GCHandle.Alloc(tag.TagData, GCHandleType.Pinned);
+            grappleHookDefinition = (GrappleHookDefinition)Marshal.PtrToStructure(TagDataHandle.AddrOfPinnedObject(), typeof(GrappleHookDefinition));
+            TagDataHandle.Free();
+
+
+            foreach (var a in grappleHookDefinition.GetType().GetFields())
+            {
+                Console.WriteLine("{0} : {1}", a.Name, a.GetValue(grappleHookDefinition));
+            }
             fileStream.Close();
-            Console.WriteLine("File Header:");
+            //WriteTagInfo(FilePath, tag);
+        }
+
+        static void WriteTagInfo(string FilePath, Tag tag)
+        {
+            StreamWriter TextOutput = new StreamWriter(Path.GetFileName(FilePath) + ".fileinfo" + ".txt")
+            {
+                AutoFlush = true //Otherwise it caps at 4096 bytes unless you flush manually
+            };
+            TextOutput.WriteLine("File Header:");
+            TextOutput.WriteLine();
             foreach (var a in tag.Header.GetType().GetFields())
             {
-                Console.WriteLine("{0} : {1}", a.Name, a.GetValue(tag.Header));
+                TextOutput.WriteLine("  {0} : {1}", a.Name, a.GetValue(tag.Header));
             }
-            Console.WriteLine("Tag Depdendencies:");
-            foreach (TagDependency tagDependency in tag.TagDependencyList)
-            {
-                foreach (var a in tagDependency.GetType().GetFields())
-                {
-                    Console.WriteLine("{0} : {1}", a.Name, a.GetValue(tagDependency));
-                }
-            }
-            Console.WriteLine("Data Blocks:");
-            foreach (DataBlock dataBlock in tag.DataBlockList)
-            {
-                foreach (var a in dataBlock.GetType().GetFields())
-                {
-                    Console.WriteLine("{0} : {1}", a.Name, a.GetValue(dataBlock));
-                }
-            }
-            Console.WriteLine("Tag Structs:");
-            foreach (TagStruct tagStruct in tag.TagStructList)
-            {
-                foreach (var a in tagStruct.GetType().GetFields())
-                {
-                    Console.WriteLine("{0} : {1}", a.Name, a.GetValue(tagStruct));
-                }
-            }
-            Console.WriteLine("Data References:");
-            foreach (DataReference dataReference in tag.DataReferenceList)
-            {
-                foreach (var a in dataReference.GetType().GetFields())
-                {
-                    Console.WriteLine("{0} : {1}", a.Name, a.GetValue(dataReference));
-                }
-            }
-            Console.WriteLine("Tag References:");
-            foreach (TagReferenceFixup tagReferenceFixup in tag.TagReferenceFixupList)
-            {
-                foreach (var a in tagReferenceFixup.GetType().GetFields())
-                {
-                    Console.WriteLine("{0} : {1}", a.Name, a.GetValue(tagReferenceFixup));
-                }
-            }
+            TextOutput.WriteLine();
+            TextOutput.WriteLine("Tag Depdendencies:");
+            TextOutput.WriteLine();
+            Utilities.WriteObjectInfo(TextOutput, tag.TagDependencyList, "Tag Dependency");
+            TextOutput.WriteLine("Data Blocks:");
+            TextOutput.WriteLine();
+            Utilities.WriteObjectInfo(TextOutput, tag.DataBlockList, "Data Block");
+            TextOutput.WriteLine("Tag Structs:");
+            TextOutput.WriteLine();
+            Utilities.WriteObjectInfo(TextOutput, tag.TagStructList, "Tag Struct");
+            TextOutput.WriteLine("Data References:");
+            TextOutput.WriteLine();
+            Utilities.WriteObjectInfo(TextOutput, tag.DataReferenceList, "Data Reference");
+            TextOutput.WriteLine("Tag Reference Fixups:");
+            TextOutput.WriteLine();
+            Utilities.WriteObjectInfo(TextOutput, tag.TagReferenceFixupList, "Tag Reference Fixup");
         }
     } 
 }
