@@ -17,7 +17,9 @@ namespace InfiniteModuleReader
             //CompressModuleItem("E:\\Mod Tools\\HIMU-main\\loadmanifest_bazaar.decompressed");
             //CompressModuleItem("E:\\CSharp\\InfiniteModuleReader\\bin\\Debug\\netcoreapp3.1\\masterchief_openworld.model_Data");
             //ReadModule();
-            ReadTag("ability_grapple_hook.grapplehookdefinitiontag");
+            //ReadTag("ability_grapple_hook.grapplehookdefinitiontag");
+            PluginReader pluginReader = new PluginReader();
+            pluginReader.LoadPlugin("(sagh)GrappleHookDefinitionTag.xml");
         }
 
         static void ReadModule()
@@ -280,17 +282,7 @@ namespace InfiniteModuleReader
             fileStream.Seek(tag.Header.StringIDCount, SeekOrigin.Current); //Data starts here after the "StringID" section which is probably something else
             tag.TagData = new byte[tag.Header.DataSize];
             fileStream.Read(tag.TagData, 0, (int)tag.Header.DataSize);
-            GrappleHookDefinition grappleHookDefinition = new GrappleHookDefinition();
 
-            GCHandle TagDataHandle = GCHandle.Alloc(tag.TagData, GCHandleType.Pinned);
-            grappleHookDefinition = (GrappleHookDefinition)Marshal.PtrToStructure(TagDataHandle.AddrOfPinnedObject(), typeof(GrappleHookDefinition));
-            TagDataHandle.Free();
-
-
-            foreach (var a in grappleHookDefinition.GetType().GetFields())
-            {
-                Console.WriteLine("{0} : {1}", a.Name, a.GetValue(grappleHookDefinition));
-            }
             fileStream.Close();
             //WriteTagInfo(FilePath, tag);
         }
