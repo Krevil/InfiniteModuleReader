@@ -20,6 +20,7 @@ namespace InfiniteModuleReader
         public ZoneSetTag[] ZoneSetTagList { get; set; }
         public byte[] TagData { get; set; }
         public byte[] ResourceData { get; set; }
+        public List<PluginItem> TagValues { get; set; }
     }
 
     [StructLayout(LayoutKind.Explicit, Size = 80)]
@@ -287,10 +288,10 @@ namespace InfiniteModuleReader
     public struct DataReferenceField
     {
         [FieldOffset(0)]
-        ulong Data;
+        public ulong Data;
 
         [FieldOffset(8)]
-        ulong TypeInfo;
+        public ulong TypeInfo;
 
         [FieldOffset(16)]
         public int UnknownProperty;
@@ -336,17 +337,17 @@ namespace InfiniteModuleReader
     public struct RealVector3D
     {
         [FieldOffset(0)]
-        public float i;
+        public float I;
 
         [FieldOffset(4)]
-        public float j;
+        public float J;
 
         [FieldOffset(8)]
-        public float k;
+        public float K;
 
         public override string ToString()
         {
-            return i + " " + j + " " + k;
+            return I + " " + J + " " + K;
         }
     }
 

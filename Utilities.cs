@@ -42,7 +42,7 @@ namespace InfiniteModuleReader
                 stream.WriteLine("{0} {1}:", objname, i);
                 foreach (var a in obj.GetType().GetFields())
                 {
-                    stream.WriteLine("  {0} : {1}", a.Name, a.GetValue(obj));
+                    stream.WriteLine("{0} : {1}", a.Name, a.GetValue(obj));
                 }
                 i++;
                 stream.WriteLine();
@@ -57,7 +57,7 @@ namespace InfiniteModuleReader
                 stream.WriteLine("{0} {1}:", objname, i);
                 foreach (var a in obj.GetType().GetFields())
                 {
-                    stream.WriteLine("  {0} : {1}", a.Name, a.GetValue(obj));
+                    stream.WriteLine("{0} : {1}", a.Name, a.GetValue(obj));
                 }
                 i++;
                 stream.WriteLine();
@@ -72,7 +72,7 @@ namespace InfiniteModuleReader
                 stream.WriteLine("{0} {1}:", objname, i);
                 foreach (var a in obj.GetType().GetFields())
                 {
-                    stream.WriteLine("  {0} : {1}", a.Name, a.GetValue(obj));
+                    stream.WriteLine("{0} : {1}", a.Name, a.GetValue(obj));
                 }
                 i++;
                 stream.WriteLine();
@@ -87,7 +87,7 @@ namespace InfiniteModuleReader
                 stream.WriteLine("{0} {1}:", objname, i);
                 foreach (var a in obj.GetType().GetFields())
                 {
-                    stream.WriteLine("  {0} : {1}", a.Name, a.GetValue(obj));
+                    stream.WriteLine("{0} : {1}", a.Name, a.GetValue(obj));
                 }
                 i++;
                 stream.WriteLine();
@@ -102,7 +102,7 @@ namespace InfiniteModuleReader
                 stream.WriteLine("{0} {1}:", objname, i);
                 foreach (var a in obj.GetType().GetFields())
                 {
-                    stream.WriteLine("  {0} : {1}", a.Name, a.GetValue(obj));
+                    stream.WriteLine("{0} : {1}", a.Name, a.GetValue(obj));
                 }
                 i++;
                 stream.WriteLine();
@@ -116,7 +116,7 @@ namespace InfiniteModuleReader
                 stream.WriteLine("{0} {1}:", objname, i);
                 foreach (var a in obj.GetType().GetFields())
                 {
-                    stream.WriteLine("  {0} : {1}", a.Name, a.GetValue(obj));
+                    stream.WriteLine("{0} : {1}", a.Name, a.GetValue(obj));
                 }
                 i++;
                 stream.WriteLine();
@@ -131,7 +131,7 @@ namespace InfiniteModuleReader
                 stream.WriteLine("{0} {1}:", objname, i);
                 foreach (var a in obj.GetType().GetFields())
                 {
-                    stream.WriteLine("  {0} : {1}", a.Name, a.GetValue(obj));
+                    stream.WriteLine("{0} : {1}", a.Name, a.GetValue(obj));
                 }
                 i++;
                 stream.WriteLine();
@@ -146,7 +146,7 @@ namespace InfiniteModuleReader
                 stream.WriteLine("{0} {1}:", objname, i);
                 foreach (var a in obj.GetType().GetFields())
                 {
-                    stream.WriteLine("  {0} : {1}", a.Name, a.GetValue(obj));
+                    stream.WriteLine("{0} : {1}", a.Name, a.GetValue(obj));
                 }
                 i++;
                 stream.WriteLine();
