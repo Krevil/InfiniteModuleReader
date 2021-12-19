@@ -24,11 +24,11 @@ namespace InfiniteModuleReader
         static void ReadModule()
         {
             Console.WriteLine("Enter path to module:");
-            //string ModulePath = Console.ReadLine();
-            string ModulePath = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Halo Infinite\\deploy\\any\\globals\\globals-rtx-new.module";
+            string ModulePath = Console.ReadLine();
+            //string ModulePath = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Halo Infinite\\deploy\\any\\globals\\globals-rtx-new.module";
             Console.WriteLine("Search for tag to edit:");
-            //string SearchTerm = Console.ReadLine();
-            string SearchTerm = "ability_grapple_hook.grapplehookdefinitiontag";
+            string SearchTerm = Console.ReadLine();
+            //string SearchTerm = "ability_grapple_hook.grapplehookdefinitiontag";
             FileStream fileStream = new FileStream(ModulePath, FileMode.Open);
             byte[] ModuleHeader = new byte[72];
             fileStream.Read(ModuleHeader, 0, 72);
